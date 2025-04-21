@@ -1,0 +1,45 @@
+[
+  {
+    "title": "Stardew Valley",
+    "developer": "ConcernedApe",
+    "genre": [
+      "Simulation",
+      "RPG"
+    ],
+    "publisher": "Chucklefish",
+    "platforms": [
+      "PC",
+      "Switch",
+      "PlayStation"
+    ],
+    "releaseYear": 2016,
+    "steamId": "413150",
+    "playtime": 120,
+    "rating": 9.5,
+    "tags": [
+      "Farming",
+      "Relaxing",
+      "Indie"
+    ],
+    "coverImagePath": "https://raw.githubusercontent.com/RezzedUp/SampleImages/main/stardew_valley.jpg"
+  },
+  {
+    "title": "brawl stars",
+    "developer": "jdnýjdcnwý",
+    "genre": [
+      "dcbhdcbwýb"
+    ],
+    "publisher": "dnhfb",
+    "platforms": [
+      "dfbh"
+    ],
+    "releaseYear": 2016,
+    "steamId": "1234",
+    "playtime": 6,
+    "rating": 4.0,
+    "tags": [
+      "bcjhdcb"
+    ],
+    "coverImagePath": "https://raw.githubusercontent.com/RezzedUp/SampleImages/main/stardew_valley.jpg"
+  }
+]

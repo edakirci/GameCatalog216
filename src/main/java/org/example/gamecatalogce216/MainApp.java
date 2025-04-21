@@ -20,7 +20,6 @@ public class MainApp extends Application {
 
         GameManager gameManager = new GameManager();
 
-
         HBox topBar = new HBox(10);
         topBar.setPadding(new Insets(10));
         Button addButton = new Button("Add");
@@ -32,7 +31,6 @@ public class MainApp extends Application {
         Button importButton = new Button("Import");
         topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton);
 
-
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
         Label searchLabel = new Label("Search");
@@ -41,7 +39,6 @@ public class MainApp extends Application {
         Button tagsButton = new Button("Tags");
         ListView<String> gameList = new ListView<>();
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButton, gameList);
-
 
         VBox centerPanel = new VBox(5);
         centerPanel.setPadding(new Insets(10));
@@ -59,18 +56,15 @@ public class MainApp extends Application {
         centerPanel.getChildren().addAll(selectedGameLabel, titleLabel, developerLabel, genreLabel, publisherLabel,
                 platformsLabel, yearLabel, steamIdLabel, playtimeLabel, ratingLabel, tagsLabel);
 
-
         VBox rightPanel = new VBox();
         rightPanel.setPadding(new Insets(10));
         Image defaultImage = new Image("https://raw.githubusercontent.com/RezzedUp/SampleImages/main/stardew_valley.jpg", 200, 300, true, true);
         ImageView coverImageView = new ImageView(defaultImage);
         rightPanel.getChildren().add(coverImageView);
 
-
         HBox middleContent = new HBox(10);
         middleContent.setPadding(new Insets(10));
         middleContent.getChildren().addAll(leftPanel, centerPanel, rightPanel);
-
 
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(10));
@@ -78,7 +72,6 @@ public class MainApp extends Application {
         HBox.setHgrow(spacerBottom, Priority.ALWAYS);
         Button helpButton = new Button("Help");
         bottomBar.getChildren().addAll(spacerBottom, helpButton);
-
 
         BorderPane root = new BorderPane();
         root.setTop(topBar);
@@ -89,6 +82,7 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        UIController uiController = new UIController(gameManager, gameList);
 
         importButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
@@ -98,14 +92,12 @@ public class MainApp extends Application {
             if (selectedFile != null) {
                 gameManager.importJson(selectedFile.getAbsolutePath());
                 System.out.println("Imported games from: " + selectedFile.getName());
-
                 gameList.getItems().clear();
                 for (Game g : gameManager.getGames()) {
                     gameList.getItems().add(g.getTitle());
                 }
             }
         });
-
 
         exportButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
@@ -118,6 +110,17 @@ public class MainApp extends Application {
             }
         });
 
+        addButton.setOnAction(e -> uiController.handleAddGame());
+
+        editButton.setOnAction(e -> {
+            String selectedTitle = gameList.getSelectionModel().getSelectedItem();
+            uiController.handleEditGame(selectedTitle);
+        });
+
+        deleteButton.setOnAction(e -> {
+            String selectedTitle = gameList.getSelectionModel().getSelectedItem();
+            uiController.handleDeleteGame(selectedTitle);
+        });
 
         gameList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
@@ -134,7 +137,6 @@ public class MainApp extends Application {
                         playtimeLabel.setText("Playtime: " + g.getPlaytime() + " hrs");
                         ratingLabel.setText("Rating: " + g.getRating());
                         tagsLabel.setText("Tags: " + String.join(", ", g.getTags()));
-
                         try {
                             Image image = new Image(g.getCoverImagePath(), 200, 300, true, true);
                             coverImageView.setImage(image);
