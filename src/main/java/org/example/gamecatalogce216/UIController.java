@@ -1,6 +1,11 @@
 package org.example.gamecatalogce216;
 
 import javafx.scene.control.ListView;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ChoiceDialog;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class UIController {
 
@@ -69,5 +74,29 @@ public class UIController {
                 gameList.getItems().add(g.getTitle());
             }
         }
+    }
+
+    public void handleFilterByTags() {
+        Set<String> allTags = new HashSet<>();
+        for (Game g : gameManager.getGames()) {
+            allTags.addAll(g.getTags());
+        }
+
+        List<String> tagList = new ArrayList<>(allTags);
+        Collections.sort(tagList);
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(tagList.isEmpty() ? null : tagList.get(0), tagList);
+        dialog.setTitle("Filter by Tag");
+        dialog.setHeaderText("Select a tag to filter games:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(selectedTag -> {
+            gameList.getItems().clear();
+            for (Game g : gameManager.getGames()) {
+                if (g.getTags().contains(selectedTag)) {
+                    gameList.getItems().add(g.getTitle());
+                }
+            }
+        });
     }
 }
