@@ -77,15 +77,16 @@ public class UIController {
     }
 
     public void handleFilterByTags() {
-        Set<String> allTags = new HashSet<>();
+        Set<String> allTags = new TreeSet<>();
         for (Game g : gameManager.getGames()) {
             allTags.addAll(g.getTags());
         }
 
-        List<String> tagList = new ArrayList<>(allTags);
-        Collections.sort(tagList);
+        if (allTags.isEmpty()) {
+            return;
+        }
 
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(tagList.isEmpty() ? null : tagList.get(0), tagList);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(allTags.iterator().next(), allTags);
         dialog.setTitle("Filter by Tag");
         dialog.setHeaderText("Select a tag to filter games:");
 
@@ -93,7 +94,7 @@ public class UIController {
         result.ifPresent(selectedTag -> {
             gameList.getItems().clear();
             for (Game g : gameManager.getGames()) {
-                if (g.getTags().contains(selectedTag)) {
+                if (g.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase(selectedTag))) {
                     gameList.getItems().add(g.getTitle());
                 }
             }

@@ -87,6 +87,7 @@ public class MainApp extends Application {
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             uiController.handleSearch(newVal);
         });
+        tagsButton.setOnAction(e -> uiController.handleFilterByTags());
 
         importButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
