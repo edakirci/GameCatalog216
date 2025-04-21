@@ -84,6 +84,10 @@ public class MainApp extends Application {
 
         UIController uiController = new UIController(gameManager, gameList);
 
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            uiController.handleSearch(newVal);
+        });
+
         importButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Import Game JSON");
