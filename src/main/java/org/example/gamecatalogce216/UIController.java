@@ -50,4 +50,24 @@ public class UIController {
             }
         }
     }
+
+
+    public void handleSearch(String query) {
+        gameList.getItems().clear();
+        if (query == null || query.trim().isEmpty()) {
+            for (Game g : gameManager.getGames()) {
+                gameList.getItems().add(g.getTitle());
+            }
+            return;
+        }
+
+        String lowerQuery = query.toLowerCase();
+        for (Game g : gameManager.getGames()) {
+            if (g.getTitle().toLowerCase().contains(lowerQuery) ||
+                    g.getDeveloper().toLowerCase().contains(lowerQuery) ||
+                    g.getPublisher().toLowerCase().contains(lowerQuery)) {
+                gameList.getItems().add(g.getTitle());
+            }
+        }
+    }
 }
