@@ -18,45 +18,34 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Game Collection");
 
-        // GameManager bağlandı
         GameManager gameManager = new GameManager();
 
-        // Top bar
+
         HBox topBar = new HBox(10);
         topBar.setPadding(new Insets(10));
-
         Button addButton = new Button("Add");
         Button editButton = new Button("Edit");
         Button deleteButton = new Button("Delete");
-
         Region spacerTop = new Region();
         HBox.setHgrow(spacerTop, Priority.ALWAYS);
-
         Button exportButton = new Button("Export");
         Button importButton = new Button("Import");
-
         topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton);
 
-        // Left panel
+
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
-
         Label searchLabel = new Label("Search");
         TextField searchField = new TextField();
         searchField.setPromptText("Search...");
-
         Button tagsButton = new Button("Tags");
-
         ListView<String> gameList = new ListView<>();
-        gameList.getItems().addAll("Game 1", "Game 2", "Game 3");
-
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButton, gameList);
 
-        // Center panel
+
         VBox centerPanel = new VBox(5);
         centerPanel.setPadding(new Insets(10));
-
-        Label selectedGameLabel = new Label("> Game2");
+        Label selectedGameLabel = new Label("> Game");
         Label titleLabel = new Label("Title:");
         Label developerLabel = new Label("Developer:");
         Label genreLabel = new Label("Genre:");
@@ -67,33 +56,14 @@ public class MainApp extends Application {
         Label playtimeLabel = new Label("Playtime:");
         Label ratingLabel = new Label("Rating:");
         Label tagsLabel = new Label("Tags:");
-
-        centerPanel.getChildren().addAll(
-                selectedGameLabel,
-                titleLabel,
-                developerLabel,
-                genreLabel,
-                publisherLabel,
-                platformsLabel,
-                yearLabel,
-                steamIdLabel,
-                playtimeLabel,
-                ratingLabel,
-                tagsLabel
-        );
+        centerPanel.getChildren().addAll(selectedGameLabel, titleLabel, developerLabel, genreLabel, publisherLabel,
+                platformsLabel, yearLabel, steamIdLabel, playtimeLabel, ratingLabel, tagsLabel);
 
 
         VBox rightPanel = new VBox();
         rightPanel.setPadding(new Insets(10));
-
-        Image coverImage = new Image(
-                "https://raw.githubusercontent.com/RezzedUp/SampleImages/main/stardew_valley.jpg",
-                200,
-                300,
-                true,
-                true
-        );
-        ImageView coverImageView = new ImageView(coverImage);
+        Image defaultImage = new Image("https://raw.githubusercontent.com/RezzedUp/SampleImages/main/stardew_valley.jpg", 200, 300, true, true);
+        ImageView coverImageView = new ImageView(defaultImage);
         rightPanel.getChildren().add(coverImageView);
 
 
@@ -127,10 +97,6 @@ public class MainApp extends Application {
             File selectedFile = fileChooser.showOpenDialog(primaryStage);
             if (selectedFile != null) {
                 gameManager.importJson(selectedFile.getAbsolutePath());
-                gameList.getItems().clear();
-                for (Game g : gameManager.getGames()) {
-                    gameList.getItems().add(g.getTitle());
-                }
                 System.out.println("Imported games from: " + selectedFile.getName());
 
                 gameList.getItems().clear();
@@ -149,6 +115,35 @@ public class MainApp extends Application {
             if (fileToSave != null) {
                 gameManager.exportJson(fileToSave.getAbsolutePath());
                 System.out.println("Exported games to: " + fileToSave.getName());
+            }
+        });
+
+
+        gameList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                for (Game g : gameManager.getGames()) {
+                    if (g.getTitle().equals(newVal)) {
+                        selectedGameLabel.setText("> " + g.getTitle());
+                        titleLabel.setText("Title: " + g.getTitle());
+                        developerLabel.setText("Developer: " + g.getDeveloper());
+                        genreLabel.setText("Genre: " + String.join(", ", g.getGenre()));
+                        publisherLabel.setText("Publisher: " + g.getPublisher());
+                        platformsLabel.setText("Platforms: " + String.join(", ", g.getPlatforms()));
+                        yearLabel.setText("Release Year: " + g.getReleaseYear());
+                        steamIdLabel.setText("SteamID: " + g.getSteamId());
+                        playtimeLabel.setText("Playtime: " + g.getPlaytime() + " hrs");
+                        ratingLabel.setText("Rating: " + g.getRating());
+                        tagsLabel.setText("Tags: " + String.join(", ", g.getTags()));
+
+                        try {
+                            Image image = new Image(g.getCoverImagePath(), 200, 300, true, true);
+                            coverImageView.setImage(image);
+                        } catch (Exception ex) {
+                            System.out.println("Kapak resmi yüklenemedi.");
+                        }
+                        break;
+                    }
+                }
             }
         });
     }
