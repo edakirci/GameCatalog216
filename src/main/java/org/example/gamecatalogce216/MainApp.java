@@ -58,7 +58,7 @@ public class MainApp extends Application {
 
         VBox rightPanel = new VBox();
         rightPanel.setPadding(new Insets(10));
-        Image defaultImage = new Image("https://raw.githubusercontent.com/RezzedUp/SampleImages/main/stardew_valley.jpg", 200, 300, true, true);
+        Image defaultImage = new Image("https://media.istockphoto.com/id/1399588872/vector/corrupted-pixel-file-icon-damage-document-symbol-sign-broken-data-vector.jpg?s=612x612&w=0&k=20&c=ffG6gVLUPfxZkTwjeqdxD67LWd8R1pQTIyIVUi-Igx0=", 200, 300, true, true);
         ImageView coverImageView = new ImageView(defaultImage);
         rightPanel.getChildren().add(coverImageView);
 
@@ -146,7 +146,8 @@ public class MainApp extends Application {
                             Image image = new Image(g.getCoverImagePath(), 200, 300, true, true);
                             coverImageView.setImage(image);
                         } catch (Exception ex) {
-                            System.out.println("Kapak resmi yüklenemedi.");
+                            System.out.println("Cover image could not be loaded.");
+                            coverImageView.setImage(defaultImage);
                         }
                         break;
                     }
