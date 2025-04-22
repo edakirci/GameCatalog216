@@ -107,4 +107,12 @@ public class UIController {
             }
         });
     }
+
+    public void handleClearTags() {
+        gameManager.exportJson("autosave.json");
+        gameList.getItems().clear();
+        for (Game game : gameManager.getGames()) {
+            gameList.getItems().add(game.getTitle());
+        }
+    }
 }

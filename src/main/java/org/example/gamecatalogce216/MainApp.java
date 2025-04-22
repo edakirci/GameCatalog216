@@ -37,8 +37,10 @@ public class MainApp extends Application {
         TextField searchField = new TextField();
         searchField.setPromptText("Search...");
         Button tagsButton = new Button("Tags");
+        Button clearTagsButton = new Button("Clear Tags");
+        HBox tagsButtonsBox = new HBox(5, tagsButton, clearTagsButton);
         ListView<String> gameList = new ListView<>();
-        leftPanel.getChildren().addAll(searchLabel, searchField, tagsButton, gameList);
+        leftPanel.getChildren().addAll(searchLabel, searchField, tagsButtonsBox, gameList);
 
         VBox centerPanel = new VBox(5);
         centerPanel.setPadding(new Insets(10));
@@ -88,6 +90,7 @@ public class MainApp extends Application {
             uiController.handleSearch(newVal);
         });
         tagsButton.setOnAction(e -> uiController.handleFilterByTags());
+        clearTagsButton.setOnAction(e -> uiController.handleClearTags());
 
         importButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
