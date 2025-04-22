@@ -1,8 +1,7 @@
 package org.example.gamecatalogce216;
 
+import javafx.scene.control.*;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ChoiceDialog;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,13 +44,21 @@ public class UIController {
     public void handleDeleteGame(String selectedTitle) {
         if (selectedTitle == null) return;
 
-        for (int i = 0; i < gameManager.getGames().size(); i++) {
-            Game g = gameManager.getGames().get(i);
-            if (g.getTitle().equals(selectedTitle)) {
-                gameManager.getGames().remove(i);
-                gameList.getItems().remove(i);
-                gameManager.exportJson("autosave.json");
-                break;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Silme Onayı");
+        alert.setHeaderText(null);
+        alert.setContentText("Do you want to delete the game : '" + selectedTitle + "'?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            for (int i = 0; i < gameManager.getGames().size(); i++) {
+                Game g = gameManager.getGames().get(i);
+                if (g.getTitle().equals(selectedTitle)) {
+                    gameManager.getGames().remove(i);
+                    gameList.getItems().remove(i);
+                    gameManager.exportJson("autosave.json");
+                    break;
+                }
             }
         }
     }
