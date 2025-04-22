@@ -4,13 +4,21 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class MainApp extends Application {
 
@@ -128,6 +136,30 @@ public class MainApp extends Application {
         deleteButton.setOnAction(e -> {
             String selectedTitle = gameList.getSelectionModel().getSelectedItem();
             uiController.handleDeleteGame(selectedTitle);
+        });
+
+        helpButton.setOnAction(e -> {
+            try {
+                InputStream pdfStream = getClass().getResourceAsStream("/GameCollectionManual.pdf");
+
+                if (pdfStream == null) {
+                    throw new FileNotFoundException("Source could not be found.");
+                }
+
+                File tempPdf = File.createTempFile("help", ".pdf");
+                tempPdf.deleteOnExit();
+                Files.copy(pdfStream, tempPdf.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                Desktop.getDesktop().open(tempPdf);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Hata");
+                alert.setHeaderText(null);
+                alert.setContentText("Yardım dosyası açılamadı.");
+                alert.showAndWait();
+            }
         });
 
         gameList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
