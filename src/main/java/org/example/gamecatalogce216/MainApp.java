@@ -50,6 +50,8 @@ public class MainApp extends Application {
         ListView<String> gameList = new ListView<>();
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButtonsBox, gameList);
 
+        VBox.setVgrow(gameList, Priority.ALWAYS);
+        
         VBox centerPanel = new VBox(5);
         centerPanel.setPadding(new Insets(10));
         Label selectedGameLabel = new Label("> Game");
@@ -75,6 +77,10 @@ public class MainApp extends Application {
         HBox middleContent = new HBox(10);
         middleContent.setPadding(new Insets(10));
         middleContent.getChildren().addAll(leftPanel, centerPanel, rightPanel);
+
+        HBox.setHgrow(leftPanel, Priority.ALWAYS);
+        HBox.setHgrow(centerPanel, Priority.ALWAYS);
+        HBox.setHgrow(rightPanel, Priority.ALWAYS);
 
         HBox bottomBar = new HBox();
         bottomBar.setPadding(new Insets(10));
