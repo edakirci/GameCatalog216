@@ -15,8 +15,6 @@ public class Game {
     private List<String> tags;
     private String coverImagePath;
 
-    // Getters and Setters (Generate them using IDE)
-
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 

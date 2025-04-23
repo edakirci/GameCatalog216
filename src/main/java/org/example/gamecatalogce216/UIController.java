@@ -4,7 +4,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.ListView;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class UIController {
 
@@ -45,7 +44,7 @@ public class UIController {
         if (selectedTitle == null) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Silme Onayı");
+        alert.setTitle("Delete Warning");
         alert.setHeaderText(null);
         alert.setContentText("Do you want to delete the game : '" + selectedTitle + "'?");
 

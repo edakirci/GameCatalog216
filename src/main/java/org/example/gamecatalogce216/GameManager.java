@@ -29,5 +29,4 @@ public class GameManager {
         this.games = games;
     }
 
-    // ileride eklenecek: addGame, deleteGame, search, filterByTags, etc.
 }
