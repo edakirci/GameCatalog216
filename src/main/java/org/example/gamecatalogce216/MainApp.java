@@ -72,6 +72,12 @@ public class MainApp extends Application {
         rightPanel.setPadding(new Insets(10));
         Image defaultImage = new Image("https://media.istockphoto.com/id/1399588872/vector/corrupted-pixel-file-icon-damage-document-symbol-sign-broken-data-vector.jpg?s=612x612&w=0&k=20&c=ffG6gVLUPfxZkTwjeqdxD67LWd8R1pQTIyIVUi-Igx0=", 200, 300, true, true);
         ImageView coverImageView = new ImageView(defaultImage);
+
+        coverImageView.setPreserveRatio(true);
+        coverImageView.setSmooth(true);
+        coverImageView.fitWidthProperty().bind(rightPanel.widthProperty().multiply(0.9));
+        coverImageView.fitHeightProperty().bind(rightPanel.heightProperty().multiply(0.9));
+
         rightPanel.getChildren().add(coverImageView);
 
         HBox middleContent = new HBox(10);
