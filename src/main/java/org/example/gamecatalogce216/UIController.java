@@ -41,7 +41,23 @@ public class UIController {
     }
 
     public void handleDeleteGame(String selectedTitle) {
-        if (selectedTitle == null) return;
+        if (gameManager.getGames().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("No Games");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no games to delete.");
+            alert.showAndWait();
+            return;
+        }
+
+        if (selectedTitle == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a game to delete.");
+            alert.showAndWait();
+            return;
+        }
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete Warning");
