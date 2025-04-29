@@ -83,12 +83,26 @@ public class UIController {
     }
 
     public void handleFilterByTags() {
+        if (gameManager.getGames().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("No Games");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no games in the list to filter by tags. Please add a game first.");
+            alert.showAndWait();
+            return;
+        }
+
         Set<String> allTags = new TreeSet<>();
         for (Game g : gameManager.getGames()) {
             allTags.addAll(g.getTags());
         }
 
         if (allTags.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("No Tags Found");
+            alert.setHeaderText(null);
+            alert.setContentText("Games exist, but no tags were found to filter.");
+            alert.showAndWait();
             return;
         }
 

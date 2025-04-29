@@ -24,7 +24,7 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Game Collection");
+        primaryStage.setTitle("Game Catalog");
 
         GameManager gameManager = new GameManager();
 
@@ -79,6 +79,8 @@ public class MainApp extends Application {
         coverImageView.fitHeightProperty().bind(rightPanel.heightProperty().multiply(0.9));
 
         rightPanel.getChildren().add(coverImageView);
+        coverImageView.setVisible(false);
+        centerPanel.setVisible(false);
 
         HBox middleContent = new HBox(10);
         middleContent.setPadding(new Insets(10));
@@ -196,9 +198,14 @@ public class MainApp extends Application {
                             System.out.println("Cover image could not be loaded.");
                             coverImageView.setImage(defaultImage);
                         }
+                        centerPanel.setVisible(true);
+                        coverImageView.setVisible(true);
                         break;
                     }
                 }
+            }else {
+                centerPanel.setVisible(false);
+                coverImageView.setVisible(false);
             }
         });
     }
