@@ -19,12 +19,14 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Game Catalog");
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.jpg"))));
 
         GameManager gameManager = new GameManager();
 
