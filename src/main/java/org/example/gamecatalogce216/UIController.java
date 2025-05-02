@@ -144,4 +144,18 @@ public class UIController {
             gameList.getItems().add(game.getTitle());
         }
     }
+
+    public void handleSortAlphabetically() {
+        gameList.getItems().clear();
+        gameManager.getGames().stream()
+                .sorted(Comparator.comparing(Game::getTitle))
+                .forEach(game -> gameList.getItems().add(game.getTitle()));
+    }
+
+    public void handleSortByRecent() {
+        gameList.getItems().clear();
+        for (Game g : gameManager.getGames()) {
+            gameList.getItems().add(g.getTitle());
+        }
+    }
 }

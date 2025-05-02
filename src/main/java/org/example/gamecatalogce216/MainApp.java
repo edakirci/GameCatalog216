@@ -30,6 +30,10 @@ public class MainApp extends Application {
 
         GameManager gameManager = new GameManager();
 
+        ComboBox<String> sortComboBox = new ComboBox<>();
+        sortComboBox.getItems().addAll("Sort by: Recent", "Sort by: Alphabetically");
+        sortComboBox.setValue("Sort by: Recent");
+
         HBox topBar = new HBox(10);
         topBar.setPadding(new Insets(10));
         Button addButton = new Button("Add");
@@ -39,7 +43,7 @@ public class MainApp extends Application {
         HBox.setHgrow(spacerTop, Priority.ALWAYS);
         Button exportButton = new Button("Export");
         Button importButton = new Button("Import");
-        topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton);
+        topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton,sortComboBox);
 
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
@@ -210,6 +214,15 @@ public class MainApp extends Application {
                 coverImageView.setVisible(false);
             }
         });
+
+        sortComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.equals("Sort Alphabetically")) {
+                uiController.handleSortAlphabetically();
+            } else {
+                uiController.handleSortByRecent();
+            }
+        });
+
     }
 
     public static void main(String[] args) {
