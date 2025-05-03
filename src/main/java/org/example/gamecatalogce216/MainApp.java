@@ -31,7 +31,6 @@ public class MainApp extends Application {
         GameManager gameManager = new GameManager();
 
         ComboBox<String> sortComboBox = new ComboBox<>();
-        sortComboBox.getItems().addAll("Sort by: Recent", "Sort by: Alphabetically");
         sortComboBox.getItems().addAll("Sort by: Recent", "Sort by: Alphabetically", "Sort by: Release Year (Newest First)", "Sort by: Rating (Highest First)");
         sortComboBox.setValue("Sort by: Recent");
 
