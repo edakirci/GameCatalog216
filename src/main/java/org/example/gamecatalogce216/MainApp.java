@@ -32,6 +32,7 @@ public class MainApp extends Application {
 
         ComboBox<String> sortComboBox = new ComboBox<>();
         sortComboBox.getItems().addAll("Sort by: Recent", "Sort by: Alphabetically");
+        sortComboBox.getItems().addAll("Sort by: Recent", "Sort by: Alphabetically", "Sort by: Release Year (Newest First)", "Sort by: Rating (Highest First)");
         sortComboBox.setValue("Sort by: Recent");
 
         HBox topBar = new HBox(10);
@@ -43,7 +44,7 @@ public class MainApp extends Application {
         HBox.setHgrow(spacerTop, Priority.ALWAYS);
         Button exportButton = new Button("Export");
         Button importButton = new Button("Import");
-        topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton,sortComboBox);
+        topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton, sortComboBox);
 
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
@@ -57,7 +58,7 @@ public class MainApp extends Application {
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButtonsBox, gameList);
 
         VBox.setVgrow(gameList, Priority.ALWAYS);
-        
+
         VBox centerPanel = new VBox(5);
         centerPanel.setPadding(new Insets(10));
         Label selectedGameLabel = new Label("> Game");
@@ -209,20 +210,20 @@ public class MainApp extends Application {
                         break;
                     }
                 }
-            }else {
+            } else {
                 centerPanel.setVisible(false);
                 coverImageView.setVisible(false);
             }
         });
 
         sortComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.equals("Sort Alphabetically")) {
-                uiController.handleSortAlphabetically();
-            } else {
-                uiController.handleSortByRecent();
+            switch (newVal) {
+                case "Sort by: Alphabetically" -> uiController.handleSortAlphabetically();
+                case "Sort by: Release Year (Newest First)" -> uiController.handleSortByReleaseYear();
+                case "Sort by: Rating (Highest First)" -> uiController.handleSortByRating();
+                default -> uiController.handleSortByRecent();
             }
         });
-
     }
 
     public static void main(String[] args) {

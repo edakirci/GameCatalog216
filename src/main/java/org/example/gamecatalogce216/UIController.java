@@ -158,4 +158,22 @@ public class UIController {
             gameList.getItems().add(g.getTitle());
         }
     }
+    public void handleSortByReleaseYear() {
+        List<Game> sortedList = new ArrayList<>(gameManager.getGames());
+        sortedList.sort(Comparator.comparingInt(Game::getReleaseYear).reversed());
+
+        gameList.getItems().clear();
+        for (Game g : sortedList) {
+            gameList.getItems().add(g.getTitle());
+        }
+    }
+    public void handleSortByRating() {
+        List<Game> sortedList = new ArrayList<>(gameManager.getGames());
+        sortedList.sort(Comparator.comparingDouble(Game::getRating).reversed());
+
+        gameList.getItems().clear();
+        for (Game g : sortedList) {
+            gameList.getItems().add(g.getTitle());
+        }
+    }
 }
