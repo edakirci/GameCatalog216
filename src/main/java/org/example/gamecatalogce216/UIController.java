@@ -17,6 +17,31 @@ public class UIController {
 
     public void handleAddGame() {
         GameForm.display(null, newGame -> {
+            boolean titleExists = gameManager.getGames().stream().anyMatch(g ->
+                    g.getTitle().equalsIgnoreCase(newGame.getTitle())
+            );
+
+            boolean steamIdExists = gameManager.getGames().stream().anyMatch(g ->
+                    g.getSteamId().equalsIgnoreCase(newGame.getSteamId())
+            );
+
+            if (titleExists || steamIdExists) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Duplicate Game");
+                alert.setHeaderText(null);
+
+                if (titleExists && steamIdExists) {
+                    alert.setContentText("This game already exists (same Title and Steam ID).");
+                } else if (titleExists) {
+                    alert.setContentText("A game with the same **Title** already exists.");
+                } else {
+                    alert.setContentText("A game with the same **Steam ID** already exists.");
+                }
+
+                alert.showAndWait();
+                return;
+            }
+
             gameManager.getGames().add(newGame);
             gameList.getItems().add(newGame.getTitle());
             gameManager.exportJson("autosave.json");
