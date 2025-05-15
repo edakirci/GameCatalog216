@@ -4,9 +4,11 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,27 +50,77 @@ public class GameForm {
         }
 
         Button saveButton = new Button("Save");
-        saveButton.setOnAction(e -> {
-            try {
-                Game game = new Game();
-                game.setTitle(titleField.getText());
-                game.setDeveloper(developerField.getText());
-                game.setGenre(splitList(genreField.getText()));
-                game.setPublisher(publisherField.getText());
-                game.setPlatforms(splitList(platformsField.getText()));
-                game.setReleaseYear(Integer.parseInt(yearField.getText()));
-                game.setSteamId(steamIdField.getText());
-                game.setPlaytime(Integer.parseInt(playtimeField.getText()));
-                game.setRating(Double.parseDouble(ratingField.getText()));
-                game.setTags(splitList(tagsField.getText()));
-                game.setCoverImagePath(coverImagePathField.getText());
+        saveButton.setOnAction(evt -> {
+            String titleText       = titleField.getText().trim();
+            String developerText   = developerField.getText().trim();
+            String genreText       = genreField.getText().trim();
+            String publisherText   = publisherField.getText().trim();
+            String platformsText   = platformsField.getText().trim();
+            String yearText        = yearField.getText().trim();
+            String steamIdText     = steamIdField.getText().trim();
+            String playtimeText    = playtimeField.getText().trim();
+            String ratingText      = ratingField.getText().trim();
+            String tagsText        = tagsField.getText().trim();
+            String coverUrlText    = coverImagePathField.getText().trim();
 
-                callback.onSave(game);
-                window.close();
-            } catch (Exception ex) {
-                showAlert("Invalid input", "Please fill all fields correctly.");
+            List<String> errors = new ArrayList<>();
+
+            if (titleText.isEmpty())
+                errors.add("• Title cannot be empty.");
+            if (developerText.isEmpty())
+                errors.add("• Developer cannot be empty.");
+
+
+            try {
+                Integer.parseInt(yearText);
+            } catch (NumberFormatException ex) {
+                errors.add("• Release Year: '" + yearText + "' is not a valid integer.");
             }
+            try {
+                Integer.parseInt(steamIdText);
+            } catch (NumberFormatException ex) {
+                errors.add("• Steam ID: '" + steamIdText + "' is not a valid integer.");
+            }
+            try {
+                Integer.parseInt(playtimeText);
+            } catch (NumberFormatException ex) {
+                errors.add("• Playtime: '" + playtimeText + "' is not a valid integer.");
+            }
+            try {
+                double r = Double.parseDouble(ratingText);
+                if (r < 0 || r > 10)
+                    errors.add("• Rating must be between 0.0 and 10.0.");
+            } catch (NumberFormatException ex) {
+                errors.add("• Rating: '" + ratingText + "' is not a valid number.");
+            }
+
+            if (!errors.isEmpty()) {
+                String allErrors = String.join("\n", errors);
+                Alert alert = new Alert(Alert.AlertType.ERROR, allErrors, ButtonType.OK);
+                alert.setTitle("Invalid Input");
+                alert.setHeaderText("Please fix the following:");
+                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                alert.showAndWait();
+                return;
+            }
+
+            Game game = new Game();
+            game.setTitle(titleText);
+            game.setDeveloper(developerText);
+            game.setGenre(Arrays.asList(genreText.split(",")));
+            game.setPublisher(publisherText);
+            game.setPlatforms(Arrays.asList(platformsText.split(",")));
+            game.setReleaseYear(Integer.parseInt(yearText));
+            game.setSteamId(steamIdText);
+            game.setPlaytime(Integer.parseInt(playtimeText));
+            game.setRating(Double.parseDouble(ratingText));
+            game.setTags(Arrays.asList(tagsText.split(",")));
+            game.setCoverImagePath(coverUrlText);
+
+            callback.onSave(game);
+            window.close();
         });
+
 
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(10));

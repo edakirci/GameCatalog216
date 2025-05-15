@@ -20,6 +20,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.Optional;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
+
 
 public class MainApp extends Application {
 
@@ -51,7 +56,7 @@ public class MainApp extends Application {
         TextField searchField = new TextField();
         searchField.setPromptText("Search...");
         Button tagsButton = new Button("Tags");
-        Button clearTagsButton = new Button("Clear Tags");
+        Button clearTagsButton = new Button("Clear All Filter Tags");
         HBox tagsButtonsBox = new HBox(5, tagsButton, clearTagsButton);
         ListView<String> gameList = new ListView<>();
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButtonsBox, gameList);
@@ -158,29 +163,8 @@ public class MainApp extends Application {
             uiController.handleDeleteGame(selectedTitle);
         });
 
-        helpButton.setOnAction(e -> {
-            try {
-                InputStream pdfStream = getClass().getResourceAsStream("/GameCollectionManual.pdf");
+        
 
-                if (pdfStream == null) {
-                    throw new FileNotFoundException("Source could not be found.");
-                }
-
-                File tempPdf = File.createTempFile("help", ".pdf");
-                tempPdf.deleteOnExit();
-                Files.copy(pdfStream, tempPdf.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-                Desktop.getDesktop().open(tempPdf);
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Hata");
-                alert.setHeaderText(null);
-                alert.setContentText("Yardım dosyası açılamadı.");
-                alert.showAndWait();
-            }
-        });
 
         gameList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {

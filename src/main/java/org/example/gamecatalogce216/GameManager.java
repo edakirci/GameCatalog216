@@ -2,8 +2,8 @@ package org.example.gamecatalogce216;
 
 import javafx.scene.control.Alert;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 
 public class GameManager {
     private List<Game> games;
@@ -16,24 +16,32 @@ public class GameManager {
         List<Game> importedGames = JSONHandler.readJson(filePath);
         if (importedGames == null) return;
 
+        Map<String, String> existingTitles = new HashMap<>();
+        Map<String, String> existingSteamIds = new HashMap<>();
 
-        for (Game game : importedGames) {
-            boolean titleExists = games.stream()
-                    .anyMatch(g -> g.getTitle().equalsIgnoreCase(game.getTitle()));
-            boolean steamIdExists = games.stream()
-                    .anyMatch(g -> g.getSteamId().equalsIgnoreCase(game.getSteamId()));
-
-            if (!titleExists && !steamIdExists) {
-                games.add(game);
-
-            }
+        for (Game g : games) {
+            existingTitles.put(g.getTitle().toLowerCase(), "");
+            existingSteamIds.put(g.getSteamId().toLowerCase(), "");
         }
 
+
+        for (Game game : importedGames) {
+            String title = game.getTitle().toLowerCase();
+            String steamId = game.getSteamId().toLowerCase();
+
+            if (!existingTitles.containsKey(title) && !existingSteamIds.containsKey(steamId)) {
+                games.add(game);
+                existingTitles.put(title, "");
+                existingSteamIds.put(steamId, "");
+            }
+        }
+        
         Alert info = new Alert(Alert.AlertType.INFORMATION);
         info.setTitle("Import Result");
         info.setHeaderText("Import completed successfully, if there is a copy it was not added");
         info.showAndWait();
     }
+
 
 
     public void exportJson(String filePath) {
