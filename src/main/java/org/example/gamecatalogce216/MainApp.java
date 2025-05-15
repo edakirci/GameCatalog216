@@ -163,7 +163,51 @@ public class MainApp extends Application {
             uiController.handleDeleteGame(selectedTitle);
         });
 
-        
+        helpButton.setOnAction(e -> {
+            String instructions =
+                    "- Add: Adds a new game\n" +
+                            "- Edit: Edits the selected game\n" +
+                            "- Delete: Deletes the selected game\n" +
+                            "- Import: Loads games from a JSON file\n" +
+                            "- Export: Saves the game list to JSON\n" +
+                            "- Search: Filters games by title, developer, or publisher\n" +
+                            "- Tags: Filters by the selected tag\n" +
+                            "- Clear All Filter Tags: Clears all selected tags\n" +
+                            "- Sort: Sorts the list by the chosen column\n";
+
+            Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setTitle("Help – Instructions");
+            infoAlert.setHeaderText("Available Actions");
+            infoAlert.setContentText(instructions);
+            infoAlert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+            infoAlert.showAndWait();
+
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Help – More Information");
+            confirmAlert.setHeaderText(null);
+            confirmAlert.setContentText("Would you like to open the full PDF manual?");
+            Optional<ButtonType> result = confirmAlert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                try {
+                    InputStream pdfStream = getClass().getResourceAsStream("/GameCollectionManual.pdf");
+                    if (pdfStream == null) throw new FileNotFoundException("Manual not found.");
+
+                    File tempPdf = File.createTempFile("GameCollectionManual", ".pdf");
+                    tempPdf.deleteOnExit();
+                    Files.copy(pdfStream, tempPdf.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                    Desktop.getDesktop().open(tempPdf);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Error");
+                    errorAlert.setHeaderText(null);
+                    errorAlert.setContentText("Failed to open the help file.");
+                    errorAlert.showAndWait();
+                }
+            }
+        });
 
 
         gameList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
