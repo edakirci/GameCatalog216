@@ -1,14 +1,17 @@
 package org.example.gamecatalogce216;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.time.Year;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +40,25 @@ public class GameForm {
         yearCombo.setValue(currentYear);
         TextField steamIdField = new TextField();
         TextField playtimeField = new TextField();
-        TextField ratingField = new TextField();
+
+        DoubleProperty ratingValue = new SimpleDoubleProperty(5.0);
+        Label ratingLabel = new Label();
+        ratingLabel.textProperty().bind(
+                javafx.beans.binding.Bindings.format("%.1f", ratingValue)
+        );
+        Button minusBtn = new Button("–");
+        Button plusBtn  = new Button("+");
+
+        minusBtn.setOnAction(e -> {
+            double v = Math.max(0.0, ratingValue.get() - 0.1);
+            ratingValue.set(Math.round(v * 10) / 10.0);
+        });
+        plusBtn.setOnAction(e -> {
+            double v = Math.min(10.0, ratingValue.get() + 0.1);
+            ratingValue.set(Math.round(v * 10) / 10.0);
+        });
+
+
         TextField tagsField = new TextField();
         TextField coverImagePathField = new TextField();
 
@@ -50,7 +71,7 @@ public class GameForm {
             yearCombo.setValue(existingGame.getReleaseYear());
             steamIdField.setText(existingGame.getSteamId());
             playtimeField.setText(String.valueOf(existingGame.getPlaytime()));
-            ratingField.setText(String.valueOf(existingGame.getRating()));
+            ratingValue.setValue(existingGame.getRating());
             tagsField.setText(String.join(",", existingGame.getTags()));
             coverImagePathField.setText(existingGame.getCoverImagePath());
         }
@@ -64,7 +85,7 @@ public class GameForm {
             String platformsText   = platformsField.getText().trim();
             String steamIdText     = steamIdField.getText().trim();
             String playtimeText    = playtimeField.getText().trim();
-            String ratingText      = ratingField.getText().trim();
+            double chosenRating    = ratingValue.get();
             String tagsText        = tagsField.getText().trim();
             String coverUrlText    = coverImagePathField.getText().trim();
 
@@ -75,8 +96,6 @@ public class GameForm {
             if (developerText.isEmpty())
                 errors.add("• Developer cannot be empty.");
 
-
-
             try {
                 Integer.parseInt(steamIdText);
             } catch (NumberFormatException ex) {
@@ -86,13 +105,6 @@ public class GameForm {
                 Integer.parseInt(playtimeText);
             } catch (NumberFormatException ex) {
                 errors.add("• Playtime: '" + playtimeText + "' is not a valid integer.");
-            }
-            try {
-                double r = Double.parseDouble(ratingText);
-                if (r < 0 || r > 10)
-                    errors.add("• Rating must be between 0.0 and 10.0.");
-            } catch (NumberFormatException ex) {
-                errors.add("• Rating: '" + ratingText + "' is not a valid number.");
             }
 
             if (!errors.isEmpty()) {
@@ -114,7 +126,7 @@ public class GameForm {
             game.setReleaseYear(yearCombo.getValue());
             game.setSteamId(steamIdText);
             game.setPlaytime(Integer.parseInt(playtimeText));
-            game.setRating(Double.parseDouble(ratingText));
+            game.setRating(chosenRating);
             game.setTags(Arrays.asList(tagsText.split(",")));
             game.setCoverImagePath(coverUrlText);
 
@@ -136,7 +148,7 @@ public class GameForm {
         grid.add(new Label("Release Year:"), 0, 5); grid.add(yearCombo, 1, 5);
         grid.add(new Label("Steam ID:"), 0, 6); grid.add(steamIdField, 1, 6);
         grid.add(new Label("Playtime (hours):"), 0, 7); grid.add(playtimeField, 1, 7);
-        grid.add(new Label("Rating:"), 0, 8); grid.add(ratingField, 1, 8);
+        grid.add(new Label("Rating:"), 0, 8); HBox hbox = new HBox(5, minusBtn, ratingLabel, plusBtn);hbox.setAlignment(Pos.CENTER_LEFT);grid.add(hbox,                 1, 8);
         grid.add(new Label("Tags (comma-separated):"), 0, 9); grid.add(tagsField, 1, 9);
         grid.add(new Label("Cover Image URL:"), 0, 10); grid.add(coverImagePathField, 1, 10);
         grid.add(saveButton, 1, 11);
