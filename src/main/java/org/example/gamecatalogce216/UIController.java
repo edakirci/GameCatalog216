@@ -101,13 +101,21 @@ public class UIController {
             for (int i = 0; i < gameManager.getGames().size(); i++) {
                 Game g = gameManager.getGames().get(i);
                 if (g.getTitle().equals(selectedTitle)) {
+                    List<String> deletedTags = new ArrayList<>(g.getTags());
                     gameManager.getGames().remove(i);
                     gameList.getItems().remove(i);
                     gameManager.exportJson("autosave.json");
+
+                    for (String tag : deletedTags) {
+                        boolean stillUsed = gameManager.getGames().stream()
+                                .anyMatch(other -> other.getTags().contains(tag));
+                        if (!stillUsed) {
+
+                            handleClearTags();
+                        }
+                    }
                     break;
                 }
-                //buraya şuanki tagin içi boş mu diye kontrol edicek if eklenecek
-                handleClearTags();
             }
         }
     }
