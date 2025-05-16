@@ -7,6 +7,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import java.time.Year;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +29,12 @@ public class GameForm {
         TextField genreField = new TextField();
         TextField publisherField = new TextField();
         TextField platformsField = new TextField();
-        TextField yearField = new TextField();
+        ComboBox<Integer> yearCombo = new ComboBox<>();
+        int currentYear = Year.now().getValue();
+        for (int y = currentYear; y >= 1950; y--) {
+            yearCombo.getItems().add(y);
+        }
+        yearCombo.setValue(currentYear);
         TextField steamIdField = new TextField();
         TextField playtimeField = new TextField();
         TextField ratingField = new TextField();
@@ -41,7 +47,7 @@ public class GameForm {
             genreField.setText(String.join(",", existingGame.getGenre()));
             publisherField.setText(existingGame.getPublisher());
             platformsField.setText(String.join(",", existingGame.getPlatforms()));
-            yearField.setText(String.valueOf(existingGame.getReleaseYear()));
+            yearCombo.setValue(existingGame.getReleaseYear());
             steamIdField.setText(existingGame.getSteamId());
             playtimeField.setText(String.valueOf(existingGame.getPlaytime()));
             ratingField.setText(String.valueOf(existingGame.getRating()));
@@ -56,7 +62,6 @@ public class GameForm {
             String genreText       = genreField.getText().trim();
             String publisherText   = publisherField.getText().trim();
             String platformsText   = platformsField.getText().trim();
-            String yearText        = yearField.getText().trim();
             String steamIdText     = steamIdField.getText().trim();
             String playtimeText    = playtimeField.getText().trim();
             String ratingText      = ratingField.getText().trim();
@@ -71,11 +76,7 @@ public class GameForm {
                 errors.add("• Developer cannot be empty.");
 
 
-            try {
-                Integer.parseInt(yearText);
-            } catch (NumberFormatException ex) {
-                errors.add("• Release Year: '" + yearText + "' is not a valid integer.");
-            }
+
             try {
                 Integer.parseInt(steamIdText);
             } catch (NumberFormatException ex) {
@@ -110,7 +111,7 @@ public class GameForm {
             game.setGenre(Arrays.asList(genreText.split(",")));
             game.setPublisher(publisherText);
             game.setPlatforms(Arrays.asList(platformsText.split(",")));
-            game.setReleaseYear(Integer.parseInt(yearText));
+            game.setReleaseYear(yearCombo.getValue());
             game.setSteamId(steamIdText);
             game.setPlaytime(Integer.parseInt(playtimeText));
             game.setRating(Double.parseDouble(ratingText));
@@ -132,7 +133,7 @@ public class GameForm {
         grid.add(new Label("Genre (comma-separated):"), 0, 2); grid.add(genreField, 1, 2);
         grid.add(new Label("Publisher:"), 0, 3); grid.add(publisherField, 1, 3);
         grid.add(new Label("Platforms (comma-separated):"), 0, 4); grid.add(platformsField, 1, 4);
-        grid.add(new Label("Release Year:"), 0, 5); grid.add(yearField, 1, 5);
+        grid.add(new Label("Release Year:"), 0, 5); grid.add(yearCombo, 1, 5);
         grid.add(new Label("Steam ID:"), 0, 6); grid.add(steamIdField, 1, 6);
         grid.add(new Label("Playtime (hours):"), 0, 7); grid.add(playtimeField, 1, 7);
         grid.add(new Label("Rating:"), 0, 8); grid.add(ratingField, 1, 8);

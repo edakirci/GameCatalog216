@@ -49,7 +49,14 @@ public class UIController {
     }
 
     public void handleEditGame(String selectedTitle) {
-        if (selectedTitle == null) return;
+        if (selectedTitle == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a game to edit.");
+            alert.showAndWait();
+            return;
+        }
 
         for (int i = 0; i < gameManager.getGames().size(); i++) {
             Game g = gameManager.getGames().get(i);
@@ -99,6 +106,8 @@ public class UIController {
                     gameManager.exportJson("autosave.json");
                     break;
                 }
+                //buraya şuanki tagin içi boş mu diye kontrol edicek if eklenecek
+                handleClearTags();
             }
         }
     }
