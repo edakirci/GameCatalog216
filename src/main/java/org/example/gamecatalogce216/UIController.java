@@ -1,221 +1,132 @@
 package org.example.gamecatalogce216;
 
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class UIController {
-
     private final GameManager gameManager;
     private final ListView<String> gameList;
+    private final Label selectedTagsLabel;
 
-    public UIController(GameManager gameManager, ListView<String> gameList) {
+    public UIController(GameManager gameManager, ListView<String> gameList, Label selectedTagsLabel) {
         this.gameManager = gameManager;
         this.gameList = gameList;
+        this.selectedTagsLabel = selectedTagsLabel;
+    }
+
+    public void handleSearch(String query) {
+        var titles = gameManager.getGames().stream()
+                .map(Game::getTitle)
+                .filter(t -> t.toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
+        gameList.getItems().setAll(titles);
     }
 
     public void handleAddGame() {
         GameForm.display(null, newGame -> {
-            boolean titleExists = gameManager.getGames().stream().anyMatch(g ->
-                    g.getTitle().equalsIgnoreCase(newGame.getTitle())
-            );
-
-            boolean steamIdExists = gameManager.getGames().stream().anyMatch(g ->
-                    g.getSteamId().equalsIgnoreCase(newGame.getSteamId())
-            );
-
-            if (titleExists || steamIdExists) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Duplicate Game");
-                alert.setHeaderText(null);
-
-                if (titleExists && steamIdExists) {
-                    alert.setContentText("This game already exists (same Title and Steam ID).");
-                } else if (titleExists) {
-                    alert.setContentText("A game with the same **Title** already exists.");
-                } else {
-                    alert.setContentText("A game with the same **Steam ID** already exists.");
-                }
-
-                alert.showAndWait();
-                return;
-            }
-
             gameManager.getGames().add(newGame);
             gameList.getItems().add(newGame.getTitle());
-            gameManager.exportJson("autosave.json");
         });
     }
 
-    public void handleEditGame(String selectedTitle) {
-        if (selectedTitle == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText(null);
-            alert.setContentText("Please select a game to edit.");
-            alert.showAndWait();
-            return;
-        }
-
-        for (int i = 0; i < gameManager.getGames().size(); i++) {
-            Game g = gameManager.getGames().get(i);
-            if (g.getTitle().equals(selectedTitle)) {
-                int index = i;
-                GameForm.display(g, updatedGame -> {
-                    gameManager.getGames().set(index, updatedGame);
-                    gameList.getItems().set(index, updatedGame.getTitle());
-                    gameManager.exportJson("autosave.json");
-                });
-                break;
-            }
-        }
+    public void handleEditGame(String title) {
+        Optional<Game> opt = gameManager.getGames().stream()
+                .filter(g -> g.getTitle().equals(title))
+                .findFirst();
+        opt.ifPresent(g -> GameForm.display(g, updated -> {
+            int idx = gameManager.getGames().indexOf(g);
+            gameManager.getGames().set(idx, updated);
+            gameList.getItems().set(idx, updated.getTitle());
+        }));
     }
 
-    public void handleDeleteGame(String selectedTitle) {
-        if (gameManager.getGames().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("No Games");
-            alert.setHeaderText(null);
-            alert.setContentText("There are no games to delete.");
-            alert.showAndWait();
-            return;
-        }
-
-        if (selectedTitle == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Selection");
-            alert.setHeaderText(null);
-            alert.setContentText("Please select a game to delete.");
-            alert.showAndWait();
-            return;
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Delete Warning");
+    public void handleDeleteGame(String title) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to delete \"" + title + "\"?",
+                ButtonType.OK, ButtonType.CANCEL);
         alert.setHeaderText(null);
-        alert.setContentText("Do you want to delete the game : '" + selectedTitle + "'?");
-
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            for (int i = 0; i < gameManager.getGames().size(); i++) {
-                Game g = gameManager.getGames().get(i);
-                if (g.getTitle().equals(selectedTitle)) {
-                    List<String> deletedTags = new ArrayList<>(g.getTags());
-                    gameManager.getGames().remove(i);
-                    gameList.getItems().remove(i);
-                    gameManager.exportJson("autosave.json");
-
-                    for (String tag : deletedTags) {
-                        boolean stillUsed = gameManager.getGames().stream()
-                                .anyMatch(other -> other.getTags().contains(tag));
-                        if (!stillUsed) {
-
-                            handleClearTags();
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-
-    public void handleSearch(String query) {
-        gameList.getItems().clear();
-        if (query == null || query.trim().isEmpty()) {
-            for (Game g : gameManager.getGames()) {
-                gameList.getItems().add(g.getTitle());
-            }
-            return;
-        }
-
-        String lowerQuery = query.toLowerCase();
-        for (Game g : gameManager.getGames()) {
-            if (g.getTitle().toLowerCase().contains(lowerQuery) ||
-                    g.getDeveloper().toLowerCase().contains(lowerQuery) ||
-                    g.getPublisher().toLowerCase().contains(lowerQuery)) {
-                gameList.getItems().add(g.getTitle());
-            }
+            gameManager.getGames().removeIf(g -> g.getTitle().equals(title));
+            gameList.getItems().remove(title);
         }
     }
 
     public void handleFilterByTags() {
-        if (gameManager.getGames().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("No Games");
-            alert.setHeaderText(null);
-            alert.setContentText("There are no games in the list to filter by tags. Please add a game first.");
-            alert.showAndWait();
-            return;
-        }
-
-        Set<String> allTags = new TreeSet<>();
-        for (Game g : gameManager.getGames()) {
-            allTags.addAll(g.getTags());
-        }
-
-        if (allTags.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("No Tags Found");
-            alert.setHeaderText(null);
-            alert.setContentText("Games exist, but no tags were found to filter.");
-            alert.showAndWait();
-            return;
-        }
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(allTags.iterator().next(), allTags);
-        dialog.setTitle("Filter by Tag");
-        dialog.setHeaderText("Select a tag to filter games:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(selectedTag -> {
-            gameList.getItems().clear();
-            for (Game g : gameManager.getGames()) {
-                if (g.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase(selectedTag))) {
-                    gameList.getItems().add(g.getTitle());
-                }
-            }
+        List<String> allTags = gameManager.getAllTags();
+        List<String> selected = new ArrayList<>();
+        ListView<String> lv = new ListView<>();
+        lv.getItems().addAll(allTags);
+        lv.setCellFactory(CheckBoxListCell.forListView(tag -> {
+            BooleanProperty prop = new SimpleBooleanProperty();
+            prop.addListener((obs, was, isNow) -> {
+                if (isNow) selected.add(tag);
+                else selected.remove(tag);
+            });
+            return prop;
+        }));
+        Dialog<List<String>> dialog = new Dialog<>();
+        dialog.setTitle("Filter by Tags");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        dialog.getDialogPane().setContent(lv);
+        dialog.setResultConverter(b -> b == ButtonType.OK ? selected : null);
+        Optional<List<String>> result = dialog.showAndWait();
+        result.ifPresent(tags -> {
+            var titles = gameManager.filterByTags(tags).stream()
+                    .map(Game::getTitle)
+                    .collect(Collectors.toList());
+            gameList.getItems().setAll(titles);
+            selectedTagsLabel.setText("Selected Tags: " + String.join(", ", tags));
         });
     }
 
     public void handleClearTags() {
-        gameManager.exportJson("autosave.json");
-        gameList.getItems().clear();
-        for (Game game : gameManager.getGames()) {
-            gameList.getItems().add(game.getTitle());
-        }
+        var titles = gameManager.getGames().stream()
+                .map(Game::getTitle)
+                .collect(Collectors.toList());
+        gameList.getItems().setAll(titles);
     }
 
     public void handleSortAlphabetically() {
-        gameList.getItems().clear();
-        gameManager.getGames().stream()
-                .sorted(Comparator.comparing(Game::getTitle))
-                .forEach(game -> gameList.getItems().add(game.getTitle()));
+        var titles = gameManager.getGames().stream()
+                .sorted((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()))
+                .map(Game::getTitle)
+                .collect(Collectors.toList());
+        gameList.getItems().setAll(titles);
+    }
+
+    public void handleSortByReleaseYear() {
+        var titles = gameManager.getGames().stream()
+                .sorted((a, b) -> Integer.compare(b.getReleaseYear(), a.getReleaseYear()))
+                .map(Game::getTitle)
+                .collect(Collectors.toList());
+        gameList.getItems().setAll(titles);
+    }
+
+    public void handleSortByRating() {
+        var titles = gameManager.getGames().stream()
+                .sorted((a, b) -> Double.compare(b.getRating(), a.getRating()))
+                .map(Game::getTitle)
+                .collect(Collectors.toList());
+        gameList.getItems().setAll(titles);
     }
 
     public void handleSortByRecent() {
-        gameList.getItems().clear();
-        for (Game g : gameManager.getGames()) {
-            gameList.getItems().add(g.getTitle());
-        }
-    }
-    public void handleSortByReleaseYear() {
-        List<Game> sortedList = new ArrayList<>(gameManager.getGames());
-        sortedList.sort(Comparator.comparingInt(Game::getReleaseYear).reversed());
-
-        gameList.getItems().clear();
-        for (Game g : sortedList) {
-            gameList.getItems().add(g.getTitle());
-        }
-    }
-    public void handleSortByRating() {
-        List<Game> sortedList = new ArrayList<>(gameManager.getGames());
-        sortedList.sort(Comparator.comparingDouble(Game::getRating).reversed());
-
-        gameList.getItems().clear();
-        for (Game g : sortedList) {
-            gameList.getItems().add(g.getTitle());
-        }
+        var titles = gameManager.getGames().stream()
+                .map(Game::getTitle)
+                .collect(Collectors.toList());
+        gameList.getItems().setAll(titles);
     }
 }

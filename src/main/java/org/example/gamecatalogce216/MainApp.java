@@ -24,6 +24,8 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
+import javafx.scene.control.Label;
+
 
 
 public class MainApp extends Application {
@@ -57,7 +59,8 @@ public class MainApp extends Application {
         searchField.setPromptText("Search...");
         Button tagsButton = new Button("Tags");
         Button clearTagsButton = new Button("Clear All Filter Tags");
-        HBox tagsButtonsBox = new HBox(5, tagsButton, clearTagsButton);
+        Label selectedTagsLabel = new Label("Selected Tags:");
+        HBox tagsButtonsBox = new HBox(5, tagsButton, clearTagsButton, selectedTagsLabel);
         ListView<String> gameList = new ListView<>();
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButtonsBox, gameList);
 
@@ -117,13 +120,16 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        UIController uiController = new UIController(gameManager, gameList);
+        UIController uiController = new UIController(gameManager, gameList, selectedTagsLabel);
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             uiController.handleSearch(newVal);
         });
         tagsButton.setOnAction(e -> uiController.handleFilterByTags());
-        clearTagsButton.setOnAction(e -> uiController.handleClearTags());
+        clearTagsButton.setOnAction(e -> {
+            uiController.handleClearTags();
+            selectedTagsLabel.setText("Selected Tags:");
+        });
 
         importButton.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();

@@ -35,7 +35,7 @@ public class GameManager {
                 existingSteamIds.put(steamId, "");
             }
         }
-        
+
         Alert info = new Alert(Alert.AlertType.INFORMATION);
         info.setTitle("Import Result");
         info.setHeaderText("Import completed successfully, if there is a copy it was not added");
@@ -54,6 +54,21 @@ public class GameManager {
 
     public void setGames(List<Game> games) {
         this.games = games;
+    }
+
+    public List<String> getAllTags() {
+        Set<String> tags = new TreeSet<>();
+        games.forEach(g -> tags.addAll(g.getTags()));
+        return new ArrayList<>(tags);
+    }
+    public List<Game> filterByTags(List<String> selectedTags) {
+        List<Game> filtered = new ArrayList<>();
+        for (Game g : games) {
+            if (g.getTags().containsAll(selectedTags)) {
+                filtered.add(g);
+            }
+        }
+        return filtered;
     }
 
 }
