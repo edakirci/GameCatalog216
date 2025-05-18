@@ -193,6 +193,24 @@ public class GameForm {
             } catch (NumberFormatException ex) {
                 errors.add("• Playtime must be an integer.");
             }
+            if (steamIdText.isEmpty()) {
+                errors.add("• Steam ID cannot be empty");
+            } else {
+                try {
+                    Integer.parseInt(steamIdText);
+                    if (existingGame != null) {
+                        if (!GameManager.isSteamIdUniqueExcept(steamIdText, existingGame)) {
+                            errors.add("• Steam ID must be unique");
+                        }
+                    } else {
+                        if (!GameManager.isSteamIdUnique(steamIdText)) {
+                            errors.add("• Steam ID must be unique");
+                        }
+                    }
+                } catch (NumberFormatException ex) {
+                    errors.add("• Steam ID must be an integer");
+                }
+            }
             if (!errors.isEmpty()) {
                 String all = String.join("\n", errors);
                 Alert a = new Alert(AlertType.ERROR, all, ButtonType.OK);

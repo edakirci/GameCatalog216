@@ -6,7 +6,7 @@ import java.util.*;
 
 
 public class GameManager {
-    private List<Game> games;
+    private static List<Game> games;
 
     public GameManager() {
         games = new ArrayList<>();
@@ -16,29 +16,25 @@ public class GameManager {
         List<Game> importedGames = JSONHandler.readJson(filePath);
         if (importedGames == null) return;
 
-        Map<String, String> existingTitles = new HashMap<>();
         Map<String, String> existingSteamIds = new HashMap<>();
+        games.forEach(g -> existingSteamIds.put(g.getSteamId().toLowerCase(), ""));
 
-        for (Game g : games) {
-            existingTitles.put(g.getTitle().toLowerCase(), "");
-            existingSteamIds.put(g.getSteamId().toLowerCase(), "");
-        }
-
-
+        int added = 0, duplicates = 0;
         for (Game game : importedGames) {
-            String title = game.getTitle().toLowerCase();
             String steamId = game.getSteamId().toLowerCase();
-
-            if (!existingTitles.containsKey(title) && !existingSteamIds.containsKey(steamId)) {
+            if (!existingSteamIds.containsKey(steamId)) {
                 games.add(game);
-                existingTitles.put(title, "");
                 existingSteamIds.put(steamId, "");
+                added++;
+            } else {
+                duplicates++;
             }
         }
 
         Alert info = new Alert(Alert.AlertType.INFORMATION);
         info.setTitle("Import Result");
-        info.setHeaderText("Import completed successfully, if there is a copy it was not added");
+        info.setHeaderText("Imported " + added + " new games");
+        info.setContentText(duplicates + " duplicates skipped");
         info.showAndWait();
     }
 
@@ -71,4 +67,13 @@ public class GameManager {
         return filtered;
     }
 
+    public static boolean isSteamIdUnique(String steamId) {
+        return games.stream().noneMatch(g -> g.getSteamId().equalsIgnoreCase(steamId));
+    }
+
+    public static boolean isSteamIdUniqueExcept(String steamId, Game exceptGame) {
+        return games.stream()
+                .filter(g -> g != exceptGame)
+                .noneMatch(g -> g.getSteamId().equalsIgnoreCase(steamId));
+    }
 }

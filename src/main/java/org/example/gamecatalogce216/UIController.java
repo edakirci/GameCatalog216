@@ -45,11 +45,22 @@ public class UIController {
         Optional<Game> opt = gameManager.getGames().stream()
                 .filter(g -> g.getTitle().equals(title))
                 .findFirst();
-        opt.ifPresent(g -> GameForm.display(g, updated -> {
-            int idx = gameManager.getGames().indexOf(g);
-            gameManager.getGames().set(idx, updated);
-            gameList.getItems().set(idx, updated.getTitle());
-        }));
+
+        opt.ifPresent(originalGame -> {
+            GameForm.display(originalGame, updatedGame -> {
+                if (!originalGame.getSteamId().equalsIgnoreCase(updatedGame.getSteamId())) {
+                    if (!gameManager.isSteamIdUnique(updatedGame.getSteamId())) {
+                        Alert error = new Alert(Alert.AlertType.ERROR);
+                        error.setContentText("Steam ID must be unique");
+                        error.showAndWait();
+                        return;
+                    }
+                }
+                int idx = gameManager.getGames().indexOf(originalGame);
+                gameManager.getGames().set(idx, updatedGame);
+                gameList.getItems().set(idx, updatedGame.getTitle());
+            });
+        });
     }
 
     public void handleDeleteGame(String title) {
