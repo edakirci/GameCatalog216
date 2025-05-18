@@ -67,6 +67,46 @@ public class GameForm {
         );
         Button minusBtn = new Button("–");
         Button plusBtn  = new Button("+");
+
+        // Text field for direct rating input
+        TextField ratingTextField = new TextField();
+        ratingTextField.setPromptText("0.0 - 10.0");
+
+        // 1. Define the StringConverter FIRST
+        javafx.util.StringConverter<Double> converter = new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(Double d) {
+                return d == null ? "" : String.format("%.1f", d);
+            }
+
+            @Override
+            public Double fromString(String s) {
+                try {
+                    return Double.parseDouble(s);
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        };
+
+// 2. Create TextFormatter WITH the converter
+        TextFormatter<Double> formatter = new TextFormatter<>(converter, 5.0, c -> {
+            if (c.getControlNewText().isEmpty()) return c;
+            try {
+                double value = Double.parseDouble(c.getControlNewText());
+                if (value >= 0.0 && value <= 10.0) {
+                    return c; // Accept valid input
+                }
+            } catch (NumberFormatException e) {
+            }
+            return null; // Reject invalid input
+        });
+
+        ratingTextField.setTextFormatter(formatter);
+
+// 3. Bind bidirectionally (NOW SAFE)
+        formatter.valueProperty().bindBidirectional(ratingValue.asObject());
+
         minusBtn.setOnAction(e -> {
             double v = Math.max(0.0, ratingValue.get() - 0.1);
             ratingValue.set(Math.round(v * 10) / 10.0);
@@ -171,7 +211,7 @@ public class GameForm {
         grid.add(new Label("Steam ID:"),                0, 6); grid.add(steamIdField,   1, 6);
         grid.add(new Label("Playtime (hours):"),        0, 7); grid.add(playtimeField,  1, 7);
         grid.add(new Label("Rating:"),                  0, 8);
-        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn);
+        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn, ratingTextField);
         hb.setAlignment(Pos.CENTER_LEFT);
         grid.add(hb, 1, 8);
         grid.add(new Label("Tags (comma-separated):"),  0, 9); grid.add(tagsField,      1, 9);
