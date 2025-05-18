@@ -90,7 +90,41 @@ public class GameForm {
             double v = Math.min(10.0, ratingValue.get() + 0.1);
             ratingValue.set(Math.round(v * 10) / 10.0);
         });
+        TextField ratingTextField = new TextField();
+        ratingTextField.setPromptText("0.0 - 10.0");
 
+        javafx.util.StringConverter<Double> converter = new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(Double d) {
+                return d == null ? "" : String.format("%.1f", d);
+            }
+
+            @Override
+            public Double fromString(String s) {
+                try {
+                    double value = Double.parseDouble(s);
+                    return Math.round(value * 10) / 10.0;
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        };
+
+        TextFormatter<Double> formatter = new TextFormatter<>(converter, 5.0, c -> {
+            if (c.getControlNewText().isEmpty()) return c;
+            try {
+                double value = Double.parseDouble(c.getControlNewText());
+                if (value >= 0.0 && value <= 10.0) {
+                    return c;
+                }
+            } catch (NumberFormatException e) {
+            }
+            return null; 
+        });
+
+        ratingTextField.setTextFormatter(formatter);
+
+        formatter.valueProperty().bindBidirectional(ratingValue.asObject());
         TextField tagsField          = new TextField();
         TextField coverImageField    = new TextField();
 
@@ -194,7 +228,7 @@ public class GameForm {
         grid.add(new Label("Steam ID:"),                0, 6); grid.add(steamIdField,   1, 6);
         grid.add(new Label("Playtime (hours):"),        0, 7); grid.add(playtimeField,  1, 7);
         grid.add(new Label("Rating:"),                  0, 8);
-        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn);
+        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn, ratingTextField);
         hb.setAlignment(Pos.CENTER_LEFT);
         grid.add(hb, 1, 8);
         grid.add(new Label("Tags (comma-separated):"),  0, 9); grid.add(tagsField,      1, 9);
