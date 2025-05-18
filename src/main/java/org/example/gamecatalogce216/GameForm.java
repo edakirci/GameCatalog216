@@ -12,7 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import javafx.stage.FileChooser;
+import java.io.File;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,7 +120,7 @@ public class GameForm {
                 }
             } catch (NumberFormatException e) {
             }
-            return null; 
+            return null;
         });
 
         ratingTextField.setTextFormatter(formatter);
@@ -127,6 +128,21 @@ public class GameForm {
         formatter.valueProperty().bindBidirectional(ratingValue.asObject());
         TextField tagsField          = new TextField();
         TextField coverImageField    = new TextField();
+
+        Button browseButton = new Button("Browse");
+        browseButton.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Cover Image");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
+            );
+            File selectedFile = fileChooser.showOpenDialog(window);
+            if (selectedFile != null) {
+                coverImageField.setText(selectedFile.toURI().toString());
+            }
+        });
+        HBox coverImageBox = new HBox(5, coverImageField, browseButton);
+        coverImageBox.setAlignment(Pos.CENTER_LEFT);
 
         if (existingGame != null) {
             titleField.setText(existingGame.getTitle());
@@ -232,7 +248,7 @@ public class GameForm {
         hb.setAlignment(Pos.CENTER_LEFT);
         grid.add(hb, 1, 8);
         grid.add(new Label("Tags (comma-separated):"),  0, 9); grid.add(tagsField,      1, 9);
-        grid.add(new Label("Cover Image URL:"),        0, 10); grid.add(coverImageField,1, 10);
+        grid.add(new Label("Cover Image URL:"),        0, 10); grid.add(coverImageBox, 1, 10);
         grid.add(saveButton,                           1, 11);
 
         Scene scene = new Scene(grid, 500, 600);
