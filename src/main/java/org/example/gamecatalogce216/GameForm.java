@@ -32,23 +32,38 @@ public class GameForm {
 
         TextField titleField     = new TextField();
         TextField developerField = new TextField();
-        TextField genreField     = new TextField();
         TextField publisherField = new TextField();
 
-        // --- PLATFORM SELECTION AS MENU OF CHECK ITEMS ---
-        MenuButton platformsMenu = new MenuButton("Select Platforms");
+        List<CheckMenuItem> genreItems = Arrays.asList(
+                new CheckMenuItem("Action"),
+                new CheckMenuItem("Adventure"),
+                new CheckMenuItem("Role-Playing"),
+                new CheckMenuItem("Simulation"),
+                new CheckMenuItem("Strategy"),
+                new CheckMenuItem("Sports & Racing")
+        );
+        MenuButton genreMenu = new MenuButton("Select Genres");
+        genreMenu.getItems().addAll(genreItems);
+        genreItems.forEach(item ->
+                item.selectedProperty().addListener((obs,o,n) ->
+                        updateMenuButtonText(genreMenu, genreItems)
+                )
+        );
+        updateMenuButtonText(genreMenu, genreItems);
+
         List<CheckMenuItem> platformItems = Arrays.asList(
                 new CheckMenuItem("Windows"),
                 new CheckMenuItem("macOS"),
                 new CheckMenuItem("Linux")
         );
+        MenuButton platformsMenu = new MenuButton("Select Platforms");
         platformsMenu.getItems().addAll(platformItems);
         platformItems.forEach(item ->
-                item.selectedProperty().addListener((obs, oldV, newV) ->
+                item.selectedProperty().addListener((obs,o,n) ->
                         updateMenuButtonText(platformsMenu, platformItems)
                 )
         );
-        updateMenuButtonText(platformsMenu, platformItems); // initialize text
+        updateMenuButtonText(platformsMenu, platformItems);
 
         ComboBox<Integer> yearCombo = new ComboBox<>();
         int currentYear = Year.now().getValue();
@@ -67,46 +82,6 @@ public class GameForm {
         );
         Button minusBtn = new Button("–");
         Button plusBtn  = new Button("+");
-
-        // Text field for direct rating input
-        TextField ratingTextField = new TextField();
-        ratingTextField.setPromptText("0.0 - 10.0");
-
-        // 1. Define the StringConverter FIRST
-        javafx.util.StringConverter<Double> converter = new javafx.util.StringConverter<>() {
-            @Override
-            public String toString(Double d) {
-                return d == null ? "" : String.format("%.1f", d);
-            }
-
-            @Override
-            public Double fromString(String s) {
-                try {
-                    return Double.parseDouble(s);
-                } catch (NumberFormatException e) {
-                    return null;
-                }
-            }
-        };
-
-// 2. Create TextFormatter WITH the converter
-        TextFormatter<Double> formatter = new TextFormatter<>(converter, 5.0, c -> {
-            if (c.getControlNewText().isEmpty()) return c;
-            try {
-                double value = Double.parseDouble(c.getControlNewText());
-                if (value >= 0.0 && value <= 10.0) {
-                    return c; // Accept valid input
-                }
-            } catch (NumberFormatException e) {
-            }
-            return null; // Reject invalid input
-        });
-
-        ratingTextField.setTextFormatter(formatter);
-
-// 3. Bind bidirectionally (NOW SAFE)
-        formatter.valueProperty().bindBidirectional(ratingValue.asObject());
-
         minusBtn.setOnAction(e -> {
             double v = Math.max(0.0, ratingValue.get() - 0.1);
             ratingValue.set(Math.round(v * 10) / 10.0);
@@ -116,19 +91,24 @@ public class GameForm {
             ratingValue.set(Math.round(v * 10) / 10.0);
         });
 
-        TextField tagsField           = new TextField();
-        TextField coverImageField     = new TextField();
+        TextField tagsField          = new TextField();
+        TextField coverImageField    = new TextField();
 
         if (existingGame != null) {
             titleField.setText(existingGame.getTitle());
             developerField.setText(existingGame.getDeveloper());
-            genreField.setText(String.join(",", existingGame.getGenre()));
             publisherField.setText(existingGame.getPublisher());
 
-            // pre-check existing platforms
-            for (CheckMenuItem item : platformItems) {
-                if (existingGame.getPlatforms().contains(item.getText())) {
-                    item.setSelected(true);
+            for (CheckMenuItem gi : genreItems) {
+                if (existingGame.getGenre().contains(gi.getText())) {
+                    gi.setSelected(true);
+                }
+            }
+            updateMenuButtonText(genreMenu, genreItems);
+
+            for (CheckMenuItem pi : platformItems) {
+                if (existingGame.getPlatforms().contains(pi.getText())) {
+                    pi.setSelected(true);
                 }
             }
             updateMenuButtonText(platformsMenu, platformItems);
@@ -145,7 +125,6 @@ public class GameForm {
         saveButton.setOnAction(evt -> {
             String titleText     = titleField.getText().trim();
             String developerText = developerField.getText().trim();
-            String genreText     = genreField.getText().trim();
             String publisherText = publisherField.getText().trim();
             String steamIdText   = steamIdField.getText().trim();
             String playtimeText  = playtimeField.getText().trim();
@@ -174,7 +153,11 @@ public class GameForm {
                 return;
             }
 
-            // collect selected platforms
+            List<String> genres = genreItems.stream()
+                    .filter(CheckMenuItem::isSelected)
+                    .map(MenuItem::getText)
+                    .collect(Collectors.toList());
+
             List<String> platforms = platformItems.stream()
                     .filter(CheckMenuItem::isSelected)
                     .map(MenuItem::getText)
@@ -183,7 +166,7 @@ public class GameForm {
             Game game = new Game();
             game.setTitle(titleText);
             game.setDeveloper(developerText);
-            game.setGenre(Arrays.asList(genreText.split("\\s*,\\s*")));
+            game.setGenre(genres);
             game.setPublisher(publisherText);
             game.setPlatforms(platforms);
             game.setReleaseYear(yearCombo.getValue());
@@ -204,21 +187,21 @@ public class GameForm {
 
         grid.add(new Label("Title:"),                   0, 0); grid.add(titleField,     1, 0);
         grid.add(new Label("Developer:"),               0, 1); grid.add(developerField, 1, 1);
-        grid.add(new Label("Genre (comma-separated):"), 0, 2); grid.add(genreField,     1, 2);
+        grid.add(new Label("Genres:"),                  0, 2); grid.add(genreMenu,      1, 2);
         grid.add(new Label("Publisher:"),               0, 3); grid.add(publisherField, 1, 3);
         grid.add(new Label("Platforms:"),               0, 4); grid.add(platformsMenu,  1, 4);
         grid.add(new Label("Release Year:"),            0, 5); grid.add(yearCombo,      1, 5);
         grid.add(new Label("Steam ID:"),                0, 6); grid.add(steamIdField,   1, 6);
         grid.add(new Label("Playtime (hours):"),        0, 7); grid.add(playtimeField,  1, 7);
         grid.add(new Label("Rating:"),                  0, 8);
-        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn, ratingTextField);
+        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn);
         hb.setAlignment(Pos.CENTER_LEFT);
         grid.add(hb, 1, 8);
         grid.add(new Label("Tags (comma-separated):"),  0, 9); grid.add(tagsField,      1, 9);
         grid.add(new Label("Cover Image URL:"),        0, 10); grid.add(coverImageField,1, 10);
         grid.add(saveButton,                           1, 11);
 
-        Scene scene = new Scene(grid, 500, 550);
+        Scene scene = new Scene(grid, 500, 600);
         window.setScene(scene);
         window.showAndWait();
     }
@@ -226,8 +209,11 @@ public class GameForm {
     private static void updateMenuButtonText(MenuButton menu, List<CheckMenuItem> items) {
         String txt = items.stream()
                 .filter(CheckMenuItem::isSelected)
-                .map(CheckMenuItem::getText)
+                .map(MenuItem::getText)
                 .collect(Collectors.joining(", "));
-        menu.setText(txt.isEmpty() ? "Select Platforms" : txt);
+        menu.setText(txt.isEmpty() ? menu.getText().startsWith("Select")
+                ? menu.getText()
+                : "Select"
+                : txt);
     }
 }
