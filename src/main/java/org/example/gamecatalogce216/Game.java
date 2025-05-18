@@ -1,19 +1,20 @@
 package org.example.gamecatalogce216;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
     private String title;
     private String developer;
-    private List<String> genre;
     private String publisher;
-    private List<String> platforms;
     private int releaseYear;
     private String steamId;
     private int playtime;
     private double rating;
-    private List<String> tags;
     private String coverImagePath;
+    private List<String> genre = new ArrayList<>();
+    private List<String> platforms = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

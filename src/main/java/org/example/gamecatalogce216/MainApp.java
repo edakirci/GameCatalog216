@@ -16,11 +16,14 @@ import javafx.stage.Stage;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
@@ -29,13 +32,27 @@ import javafx.scene.control.Label;
 
 
 public class MainApp extends Application {
-
+    private ListView<String> gameList;
     @Override
     public void start(Stage primaryStage) {
+        gameList = new ListView<>();
+
         primaryStage.setTitle("Game Catalog");
         primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icon.jpg"))));
 
         GameManager gameManager = new GameManager();
+        //Load sample games
+        try (InputStream is = getClass().getResourceAsStream("/sampleGames.json")) {
+            if (is != null) {
+                List<Game> sampleGames = JSONHandler.readJsonFromStream(is);
+                gameManager.getGames().addAll(sampleGames);
+                gameList.getItems().setAll( // Now accessible
+                        sampleGames.stream().map(Game::getTitle).collect(Collectors.toList())
+                );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         ComboBox<String> sortComboBox = new ComboBox<>();
         sortComboBox.getItems().addAll("Sort by: Recent", "Sort by: Alphabetically", "Sort by: Release Year (Newest First)", "Sort by: Rating (Highest First)");
@@ -61,7 +78,6 @@ public class MainApp extends Application {
         Button clearTagsButton = new Button("Clear All Filter Tags");
         Label selectedTagsLabel = new Label("Selected Tags:");
         HBox tagsButtonsBox = new HBox(5, tagsButton, clearTagsButton, selectedTagsLabel);
-        ListView<String> gameList = new ListView<>();
         leftPanel.getChildren().addAll(searchLabel, searchField, tagsButtonsBox, gameList);
 
         VBox.setVgrow(gameList, Priority.ALWAYS);

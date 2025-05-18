@@ -17,15 +17,21 @@ public class JSONHandler {
 
                 game.setTitle(getAsString(obj, "title"));
                 game.setDeveloper(getAsString(obj, "developer"));
-                game.setGenre(getAsStringList(obj, "genre"));
                 game.setPublisher(getAsString(obj, "publisher"));
-                game.setPlatforms(getAsStringList(obj, "platforms"));
                 game.setReleaseYear(getAsInt(obj, "releaseYear", 0));
                 game.setSteamId(getAsString(obj, "steamId"));
                 game.setPlaytime(getAsInt(obj, "playtime", 0));
                 game.setRating(getAsDouble(obj, "rating", 0.0));
-                game.setTags(getAsStringList(obj, "tags"));
                 game.setCoverImagePath(getAsString(obj, "coverImagePath"));
+
+                List<String> genreList = getAsStringList(obj, "genre");
+                game.setGenre(genreList != null ? genreList : new ArrayList<>());
+
+                List<String> platformsList = getAsStringList(obj, "platforms");
+                game.setPlatforms(platformsList != null ? platformsList : new ArrayList<>());
+
+                List<String> tagsList = getAsStringList(obj, "tags");
+                game.setTags(tagsList != null ? tagsList : new ArrayList<>());
 
                 gameList.add(game);
             }
@@ -65,5 +71,40 @@ public class JSONHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<Game> readJsonFromStream(InputStream inputStream) {
+        List<Game> gameList = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
+            for (JsonElement element : jsonArray) {
+                JsonObject obj = element.getAsJsonObject();
+                Game game = new Game();
+
+                // ADD ALL THESE LINES (same as readJson()):
+                game.setTitle(getAsString(obj, "title"));
+                game.setDeveloper(getAsString(obj, "developer"));
+                game.setPublisher(getAsString(obj, "publisher"));
+                game.setReleaseYear(getAsInt(obj, "releaseYear", 0));
+                game.setSteamId(getAsString(obj, "steamId"));
+                game.setPlaytime(getAsInt(obj, "playtime", 0));
+                game.setRating(getAsDouble(obj, "rating", 0.0));
+                game.setCoverImagePath(getAsString(obj, "coverImagePath"));
+
+                List<String> genreList = getAsStringList(obj, "genre");
+                game.setGenre(genreList != null ? genreList : new ArrayList<>());
+
+                List<String> platformsList = getAsStringList(obj, "platforms");
+                game.setPlatforms(platformsList != null ? platformsList : new ArrayList<>());
+
+                List<String> tagsList = getAsStringList(obj, "tags");
+                game.setTags(tagsList != null ? tagsList : new ArrayList<>());
+
+                gameList.add(game);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return gameList;
     }
 }
