@@ -63,11 +63,12 @@ public class MainApp extends Application {
         Button addButton = new Button("Add");
         Button editButton = new Button("Edit");
         Button deleteButton = new Button("Delete");
+        Button deleteAllButton = new Button("Delete All");
         Region spacerTop = new Region();
         HBox.setHgrow(spacerTop, Priority.ALWAYS);
         Button exportButton = new Button("Export");
         Button importButton = new Button("Import");
-        topBar.getChildren().addAll(addButton, editButton, deleteButton, spacerTop, exportButton, importButton, sortComboBox);
+        topBar.getChildren().addAll(addButton, editButton, deleteButton, deleteAllButton, spacerTop, exportButton, importButton, sortComboBox);
 
         VBox leftPanel = new VBox(10);
         leftPanel.setPadding(new Insets(10));
@@ -185,11 +186,14 @@ public class MainApp extends Application {
             uiController.handleDeleteGame(selectedTitle);
         });
 
+        deleteAllButton.setOnAction(e -> uiController.handleDeleteAllGames());
+
         helpButton.setOnAction(e -> {
             String instructions =
                     "- Add: Adds a new game\n" +
                             "- Edit: Edits the selected game\n" +
                             "- Delete: Deletes the selected game\n" +
+                            "- Delete All: Removes all games from the catalog\n" +
                             "- Import: Loads games from a JSON file\n" +
                             "- Export: Saves the game list to JSON\n" +
                             "- Search: Filters games by title, developer, or publisher\n" +

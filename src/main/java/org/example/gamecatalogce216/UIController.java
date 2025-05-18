@@ -64,6 +64,20 @@ public class UIController {
         }
     }
 
+    public void handleDeleteAllGames() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to delete ALL games? This cannot be undone!",
+                ButtonType.OK, ButtonType.CANCEL
+        );
+        alert.setHeaderText(null);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            gameManager.getGames().clear();
+            gameList.getItems().clear();
+        }
+    }
+
     public void handleFilterByTags() {
         List<String> allTags = gameManager.getAllTags();
         List<String> selected = new ArrayList<>();
