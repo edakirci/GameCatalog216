@@ -259,7 +259,7 @@ public class GameForm {
         grid.add(new Label("Publisher:"),               0, 3); grid.add(publisherField, 1, 3);
         grid.add(new Label("Platforms:"),               0, 4); grid.add(platformsMenu,  1, 4);
         grid.add(new Label("Release Year:"),            0, 5); grid.add(yearCombo,      1, 5);
-        grid.add(new Label("Steam ID:"),                0, 6); grid.add(steamIdField,   1, 6);
+        grid.add(new Label("Steam ID (unique int):"),                0, 6); grid.add(steamIdField,   1, 6);
         grid.add(new Label("Playtime (hours):"),        0, 7); grid.add(playtimeField,  1, 7);
         grid.add(new Label("Rating:"),                  0, 8);
         HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn, ratingTextField);
