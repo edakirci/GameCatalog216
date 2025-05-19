@@ -91,8 +91,6 @@ public class GameForm {
             double v = Math.min(10.0, ratingValue.get() + 0.1);
             ratingValue.set(Math.round(v * 10) / 10.0);
         });
-        TextField ratingTextField = new TextField();
-        ratingTextField.setPromptText("0.0 - 10.0");
 
         javafx.util.StringConverter<Double> converter = new javafx.util.StringConverter<>() {
             @Override
@@ -123,7 +121,6 @@ public class GameForm {
             return null;
         });
 
-        ratingTextField.setTextFormatter(formatter);
 
         formatter.valueProperty().bindBidirectional(ratingValue.asObject());
         TextField tagsField          = new TextField();
@@ -262,7 +259,7 @@ public class GameForm {
         grid.add(new Label("Steam ID (unique int):"),                0, 6); grid.add(steamIdField,   1, 6);
         grid.add(new Label("Playtime (hours):"),        0, 7); grid.add(playtimeField,  1, 7);
         grid.add(new Label("Rating:"),                  0, 8);
-        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn, ratingTextField);
+        HBox hb = new HBox(5, minusBtn, ratingLabel, plusBtn);
         hb.setAlignment(Pos.CENTER_LEFT);
         grid.add(hb, 1, 8);
         grid.add(new Label("Tags (comma-separated):"),  0, 9); grid.add(tagsField,      1, 9);
