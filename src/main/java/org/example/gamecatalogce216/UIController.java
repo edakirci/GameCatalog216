@@ -5,7 +5,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -42,6 +41,15 @@ public class UIController {
     }
 
     public void handleEditGame(String title) {
+
+        if (title == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a game to edit.");
+            alert.showAndWait();
+            return;
+        }
         Optional<Game> opt = gameManager.getGames().stream()
                 .filter(g -> g.getTitle().equals(title))
                 .findFirst();
@@ -64,6 +72,15 @@ public class UIController {
     }
 
     public void handleDeleteGame(String title) {
+        if (title == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Selection");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a game to delete.");
+            alert.showAndWait();
+            return;
+        }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "Are you sure you want to delete \"" + title + "\"?",
                 ButtonType.OK, ButtonType.CANCEL);
@@ -76,6 +93,15 @@ public class UIController {
     }
 
     public void handleDeleteAllGames() {
+        if (gameList.getItems().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Games Found");
+            alert.setHeaderText(null);
+            alert.setContentText("List is already empty");
+            alert.showAndWait();
+            return;
+        }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                 "Are you sure you want to delete ALL games? This cannot be undone!",
                 ButtonType.OK, ButtonType.CANCEL
@@ -90,7 +116,19 @@ public class UIController {
     }
 
     public void handleFilterByTags() {
-        List<String> allTags = gameManager.getAllTags();
+        List<String> allTags = gameManager.getAllTags().stream()
+                .filter(t -> t != null && !t.trim().isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+        if (allTags.isEmpty()) {
+            Alert noTagsAlert = new Alert(Alert.AlertType.INFORMATION);
+            noTagsAlert.setTitle("No Tags Found");
+            noTagsAlert.setHeaderText(null);
+            noTagsAlert.setContentText("There are no tags available to filter.");
+            noTagsAlert.showAndWait();
+            return;
+        }
+
         List<String> selected = new ArrayList<>();
         ListView<String> lv = new ListView<>();
         lv.getItems().addAll(allTags);
@@ -102,18 +140,29 @@ public class UIController {
             });
             return prop;
         }));
+
         Dialog<List<String>> dialog = new Dialog<>();
         dialog.setTitle("Filter by Tags");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.getDialogPane().setContent(lv);
-        dialog.setResultConverter(b -> b == ButtonType.OK ? selected : null);
+        dialog.setResultConverter(button -> button == ButtonType.OK ? selected : null);
+
         Optional<List<String>> result = dialog.showAndWait();
         result.ifPresent(tags -> {
-            var titles = gameManager.filterByTags(tags).stream()
+            List<String> titles = gameManager.filterByTags(tags).stream()
                     .map(Game::getTitle)
                     .collect(Collectors.toList());
-            gameList.getItems().setAll(titles);
-            selectedTagsLabel.setText("Selected Tags: " + String.join(", ", tags));
+
+            if (titles.isEmpty()) {
+                Alert noGamesAlert = new Alert(Alert.AlertType.INFORMATION);
+                noGamesAlert.setTitle("No Games Found");
+                noGamesAlert.setHeaderText(null);
+                noGamesAlert.setContentText("No games found for the selected tags.");
+                noGamesAlert.showAndWait();
+            } else {
+                gameList.getItems().setAll(titles);
+                selectedTagsLabel.setText("Selected Tags: " + String.join(", ", tags));
+            }
         });
     }
 
@@ -130,6 +179,13 @@ public class UIController {
                 .map(Game::getTitle)
                 .collect(Collectors.toList());
         gameList.getItems().setAll(titles);
+        if (titles.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Games Found");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no games to sort. Please add at least one game first.");
+            alert.showAndWait();
+        }
     }
 
     public void handleSortByReleaseYear() {
@@ -138,6 +194,13 @@ public class UIController {
                 .map(Game::getTitle)
                 .collect(Collectors.toList());
         gameList.getItems().setAll(titles);
+        if (titles.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Games Found");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no games to sort. Please add at least one game first.");
+            alert.showAndWait();
+        }
     }
 
     public void handleSortByRating() {
@@ -146,6 +209,13 @@ public class UIController {
                 .map(Game::getTitle)
                 .collect(Collectors.toList());
         gameList.getItems().setAll(titles);
+        if (titles.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Games Found");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no games to sort. Please add at least one game first.");
+            alert.showAndWait();
+        }
     }
 
     public void handleSortByRecent() {
@@ -153,5 +223,12 @@ public class UIController {
                 .map(Game::getTitle)
                 .collect(Collectors.toList());
         gameList.getItems().setAll(titles);
+        if (titles.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Games Found");
+            alert.setHeaderText(null);
+            alert.setContentText("There are no games to sort. Please add at least one game first.");
+            alert.showAndWait();
+        }
     }
 }

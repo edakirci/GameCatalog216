@@ -39,7 +39,6 @@ public class JSONHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return gameList;
     }
 
@@ -81,7 +80,6 @@ public class JSONHandler {
                 JsonObject obj = element.getAsJsonObject();
                 Game game = new Game();
 
-                // ADD ALL THESE LINES (same as readJson()):
                 game.setTitle(getAsString(obj, "title"));
                 game.setDeveloper(getAsString(obj, "developer"));
                 game.setPublisher(getAsString(obj, "publisher"));
