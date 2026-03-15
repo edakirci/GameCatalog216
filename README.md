@@ -124,14 +124,14 @@ build.gradle → project dependencies
 # How to Run
 
 1. Clone the repository
-```bash git clone https://github.com/edakirci/GameCatalog216.git
+```bash git clone [https://github.com/edakirci/GameCatalog216.git](https://github.com/edakirci/GameCatalog216.git)
 ```  
 2. Open the project on Intellij IDEA
 3. Run the main application class
 
 ---
 
-#Course Information
+# Course Information
 Course: CE216 – Object Oriented Programming
 Semester: Spring 2024–2025
 
