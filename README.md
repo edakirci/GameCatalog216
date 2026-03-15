@@ -145,7 +145,8 @@ git clone [https://github.com/edakirci/GameCatalog216.git](https://github.com/ed
 ---
 
 # Course Information
-Course: CE216 – Object Oriented Programming
+Course: CE216 – Fundtamental Topics in Porgramming
+
 Semester: Spring 2024–2025
 
 Instructor:
