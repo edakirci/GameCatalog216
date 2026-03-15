@@ -113,11 +113,14 @@ Example:
 ---
 ## Application Screenshots
 
-### Main Interface
-![Main UI](screenshots/main.png)
+### Main Screen
+![Main Screen](screenshots/main.png)
 
 ### Game Details
 ![Game Details](screenshots/details.png)
+
+### Add Game Screen
+![Add Game](screenshots/add-game.png)
 
 ---
 
