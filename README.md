@@ -111,12 +111,21 @@ Example:
 ``` 
 
 ---
+## Application Screenshots
 
-# Project Structure
+### Main Interface
+![Main UI](screenshots/main.png)
 
-src/ → application source code
-gradle/ → Gradle configuration files
-build.gradle → project dependencies
+### Game Details
+![Game Details](screenshots/details.png)
+
+---
+
+## Project Structure
+
+- `src/` → application source code  
+- `gradle/` → Gradle configuration files  
+- `build.gradle` → project dependencies
 
 
 ---
@@ -124,7 +133,8 @@ build.gradle → project dependencies
 # How to Run
 
 1. Clone the repository
-```bash git clone [https://github.com/edakirci/GameCatalog216.git](https://github.com/edakirci/GameCatalog216.git)
+```bash
+git clone [https://github.com/edakirci/GameCatalog216.git](https://github.com/edakirci/GameCatalog216.git)
 ```  
 2. Open the project on Intellij IDEA
 3. Run the main application class
