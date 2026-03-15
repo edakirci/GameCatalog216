@@ -3,7 +3,7 @@
 ![JSON](https://img.shields.io/badge/Data-JSON-green)
 ![Gradle](https://img.shields.io/badge/Build-Gradle-darkgreen)
 
-# Game Catalog 216
+# Game Catalog
 
 This project is a **video game catalog management application** developed for the **CE216 course (Spring 2024–2025)**.
 
