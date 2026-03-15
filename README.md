@@ -137,7 +137,7 @@ Example:
 
 1. Clone the repository
 ```bash
-git clone [https://github.com/edakirci/GameCatalog216.git](https://github.com/edakirci/GameCatalog216.git)
+git clone [https://github.com/edakirci/GameCatalog216.git]
 ```  
 2. Open the project on Intellij IDEA
 3. Run the main application class
